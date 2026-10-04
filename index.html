@@ -215,6 +215,7 @@ nav .ln a.act{color:#1D4ED8;background:rgba(37,99,235,.12)}
 <div class="glass c3 rv"><b class="g" data-c="a">0</b>Research Areas</div>
 <div class="glass c3 rv"><b class="g" data-c="s">0</b>Skills &amp; Tools</div>
 <div class="glass c3 rv"><b class="g" data-c="p">0</b>Projects</div>
+<div class="glass c3 rv"><b class="g" data-c="r">0</b>Publications</div>
 <div class="glass c3 rv"><b class="g" data-c="v">0</b>Profile Visits</div>
 </div>
 </section>
@@ -222,7 +223,7 @@ nav .ln a.act{color:#1D4ED8;background:rgba(37,99,235,.12)}
 <div id="secs"></div>
 <div id="asw"><button class="btn p" onclick="addSec()">+ Add new section</button></div>
 </main>
-<footer class="glass" style="border-radius:0">© <span class="nm">Rezaul Islam.</span> All Rights Reserved</footer>
+<footer class="glass" style="border-radius:0">© 2026 <span class="nm">Rezaul Islam</span> · Statistics · Machine Learning · Data Analysis</footer>
 
 <div id="lb" role="dialog" aria-modal="true" aria-label="Certificate"><div class="lbx"><img id="lbi" alt="Certificate" hidden><div><a id="lbl" class="btn" target="_blank" rel="noopener" hidden>Open credential ↗</a> <button class="btn" id="lbc" type="button">Close</button></div></div></div><input type="file" id="cf2" accept="image/*" hidden>
 <div id="lg" hidden><form id="lgf" class="glass"><h2 style="font-size:24px">Admin login</h2><p class="m">Private area. Sign in to edit the portfolio.</p><input id="lgm" type="email" placeholder="Email" autocomplete="username" required><input id="lgp" type="password" placeholder="Password" autocomplete="current-password" required><button class="btn p" type="submit">Sign in</button><div id="lge" role="alert" style="color:#B91C1C;font-weight:600"></div><a href="../">← Back to site</a></form></div>
@@ -288,7 +289,7 @@ const add=k=>`<button class="btn ed add" onclick="addI('${k}')">+ Add</button>`;
 function render(){
  const keep=scrollY;
  $('secs').innerHTML=allSec().filter(visS).map((s,n)=>`<section id="${s[0]}"${(D.hide||{})[s[0]]?' class="dim"':''} style="background:linear-gradient(${135+n*5}deg,hsl(${140+n*6} 55% 97%),hsl(${208-n*3} 90% ${96-n%3}%) 50%,hsl(${80+n*4} 70% 96%))"><div class="orb" style="width:280px;height:280px;background:${n%2?'#C8F08A':'#93C5FD'};top:${n*7}px;${n%2?'right':'left'}:-90px;animation-delay:${-n}s"></div><div class="w">${sctl(s)}<span class="badge rv">${s[1]}</span><h2 class="rv">${s[2]}</h2>${body(s[0])}</div></section>`).join('');
- navB();sync();ce();obs();hydrate();navObs();scrollTo(0,keep);
+ navB();sync();ce();obs();hydrate();navObs();scrollTo(0,keep);if(counted)stats(600);
 }
 function sync(){
  document.querySelectorAll('.nm').forEach(n=>n.textContent=pl(D.set.name));
@@ -339,7 +340,10 @@ $('sp').onclick=e=>{if(e.target.id=='sp')$('sp').classList.remove('show')};
 document.addEventListener('keydown',e=>{if(e.key=='Escape'){$('sp').classList.remove('show');$('lb').classList.remove('show')}if(e.ctrlKey&&e.shiftKey&&e.key.toLowerCase()=='a'){e.preventDefault();openSet()}});
 /* Scroll reveal + counters */
 let io;function obs(){io&&io.disconnect();io=new IntersectionObserver(es=>es.forEach(x=>{if(x.isIntersecting){x.target.classList.add('in');io.unobserve(x.target)}}),{threshold:.12});document.querySelectorAll('.rv').forEach(n=>io.observe(n))}
-let counted=false;new IntersectionObserver((es,o)=>{if(es[0].isIntersecting&&!counted){counted=true;const V={a:D.areas.length,s:D.skills.reduce((n,s)=>n+sp(s.tags).filter(x=>x.trim()).length,0),p:D.proj.length,v:visits};document.querySelectorAll('[data-c]').forEach(n=>{const to=V[n.dataset.c],t0=performance.now();if(to==null){n.textContent='—';return}(function f(t){const p=Math.min(1,(t-t0)/1400);n.textContent=Math.round(to*(1-Math.pow(1-p,3)));if(p<1)requestAnimationFrame(f)})(t0)})}},{threshold:.3}).observe($('st'));
+let counted=false;
+const statVals=()=>({a:D.areas.length,s:D.skills.reduce((n,s)=>n+sp(s.tags).filter(x=>x.trim()).length,0),p:D.proj.length,r:(D.res||[]).length,v:visits});
+function stats(dur){const V=statVals();document.querySelectorAll('[data-c]').forEach(n=>{const to=V[n.dataset.c];if(to==null){n.textContent='—';return}const from=parseInt(n.textContent)||0;if(from===to){n.textContent=to;return}const t0=performance.now();(function f(t){const p=dur?Math.min(1,(t-t0)/dur):1;n.textContent=Math.round(from+(to-from)*(1-Math.pow(1-p,3)));if(p<1)requestAnimationFrame(f)})(t0)})}
+new IntersectionObserver((es)=>{if(es[0].isIntersecting&&!counted){counted=true;stats(1400)}},{threshold:.3}).observe($('st'));
 /* Typing */
 (function(){const el=$('ty'),Wf=()=>D.words&&D.words.length?D.words:['Data Analyst'];let w=0,c=0,d=1;if(matchMedia('(prefers-reduced-motion:reduce)').matches){el.textContent=Wf().join(' · ');return}
 (function s(){const x=Wf()[w%Wf().length];c+=d;el.textContent=x.slice(0,c);if(d>0&&c==x.length){d=-1;return setTimeout(s,1400)}if(d<0&&c==0){d=1;w=(w+1)%Wf().length}setTimeout(s,d>0?90:45)})()})();
@@ -412,10 +416,18 @@ async function seedIf(){const{data}=await SB.from('portfolio').select('id').eq('
 async function boot(){
 if(!SB){document.body.insertAdjacentHTML('afterbegin','<p style="padding:12px;background:#fee;color:#900;position:relative;z-index:99">Backend not configured: fill in config.js</p>');return}
 try{const{data}=await SB.from('portfolio').select('content').eq('id',1).maybeSingle();if(data)applyC(data.content)}catch(e){}
-try{let v;try{v=localStorage.getItem('rz_vid')||crypto.randomUUID();localStorage.setItem('rz_vid',v)}catch(e){v=crypto.randomUUID()}const{data}=await SB.rpc('log_visit',{p_vid:v});if(typeof data=='number'){visits=data;const n=document.querySelector('[data-c="v"]');if(n)n.textContent=data}}catch(e){}
+try{
+ let v;try{v=localStorage.getItem('rz_vid')||crypto.randomUUID();localStorage.setItem('rz_vid',v)}catch(e){v=crypto.randomUUID()}
+ let owner=false,seen=false;try{owner=!!localStorage.getItem('rz_owner');seen=!!sessionStorage.getItem('rz_sv')}catch(e){}
+ let r;
+ if(!ISADM&&!owner&&!seen){r=await SB.rpc('log_view',{p_vid:v});if(r.error)r=await SB.rpc('log_visit',{p_vid:v});try{sessionStorage.setItem('rz_sv','1')}catch(e){}}
+ else{r=await SB.rpc('get_views');if(r.error)r={data:null}}
+ if(typeof r.data=='number'||typeof r.data=='string'){visits=Number(r.data);stats(0)}
+}catch(e){}
 render();
+SB.channel('vw').on('postgres_changes',{event:'*',schema:'public',table:'site_stats'},p=>{try{const n=Number(p.new.views);if(!isNaN(n)){visits=n;stats(700)}}catch(e){}}).subscribe();
 SB.channel('pf').on('postgres_changes',{event:'*',schema:'public',table:'portfolio'},p=>{if(CAN&&E())return;try{applyC(p.new.content);render()}catch(e){}}).subscribe();
-if(ISADM){if(await checkAdmin()){await enter();await seedIf()}else document.getElementById('lg').hidden=false}}
+if(ISADM){if(await checkAdmin()){try{localStorage.setItem('rz_owner','1')}catch(e){}await enter();await seedIf()}else document.getElementById('lg').hidden=false}}
 if(ISADM)document.getElementById('lgf').onsubmit=async e=>{e.preventDefault();const er=document.getElementById('lge');er.textContent='';const{error}=await SB.auth.signInWithPassword({email:document.getElementById('lgm').value.trim(),password:document.getElementById('lgp').value});if(error){er.textContent='Login failed: '+error.message;return}if(!await checkAdmin()){await SB.auth.signOut();er.textContent='This account is not an admin.';return}await enter();await seedIf()};
 document.getElementById('lo').onclick=async()=>{await SB.auth.signOut();location.reload()};
 boot();
