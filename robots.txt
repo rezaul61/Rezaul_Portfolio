@@ -1,0 +1,5 @@
+User-agent: *
+Allow: /
+Disallow: /admin/
+
+Sitemap: https://rezaul61.github.io/rezaul_portfolio/sitemap.xml
